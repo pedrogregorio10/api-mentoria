@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\StoreUpdateRequest;
+use App\Traits\UploadThumbTrait;
 class UserController extends Controller
 {
+    use UploadThumbTrait;
+
     public function index(){
         $user = User::all();
         return $user;
@@ -21,10 +24,9 @@ class UserController extends Controller
         $validatedData = $request->validated();
 
         if($request->hasFile('thumb')){
-            $thumb = $request->file('thumb');
-            $thumb_name = time().'-mentoria-'.$thumb->getClientOriginalName();
-            $validatedData['thumb'] = $thumb->storeAs('photos',$thumb_name,'public');
+            $validatedData['thumb'] = $this->uploadThumbTrait($request->file('thumb'),'photos');
         }
+
         $validatedData['password'] = Hash::make($validatedData['password']);
         $user = User::create($validatedData);
     
@@ -48,9 +50,8 @@ class UserController extends Controller
                        Storage::disk('public')->delete($old_thumb);
                    }
                }
-               $thumb = $request->file('thumb');
-               $thumb_name = time().'-mentoria-'.$thumb->getClientOriginalName();
-               $validatedData['thumb'] = $thumb->storeAs('photos', $thumb_name,'public');
+               //Chama o metodo trait que salva e retorna o path salvo no store, com nome da pasta que se deseja
+               $validatedData['thumb'] = $this->uploadThumbTrait($request->file('thumb'),'photos');
            }
             $user = $user->update($validatedData);
 
