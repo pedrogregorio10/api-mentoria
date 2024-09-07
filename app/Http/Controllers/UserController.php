@@ -20,7 +20,7 @@ class UserController extends Controller
 
         $validate = Validator::make($request->all(),[
             'name' => ['required', 'max:255'],
-            'email' =>['required', 'unique:users,email'],
+            'email' =>['required','email','unique:users,email'],
             'password' => ['required', 'min:8'],
             'bio' => ['nullable'],
             'thumb' => ['nullable','max:2048', 'image', 'mimes:png,jpg,jpeg'],
@@ -43,6 +43,44 @@ class UserController extends Controller
             'user' => $user,
         ],201);
 
+    }
+
+    public function update(Request $request, string $id){
+
+            $validate = Validator::make($request->all(), [
+                'name' => ['required', 'max:255'],
+                'email' => ['required','email','unique:users,email,'.$id],
+                'bio' => ['nullable'],
+                'thumb' => ['nullable', 'mimes:jpeg,jpg,png','max:2048'],
+                'type' => ['required', 'in:mentor,mentee'],
+           ]);
+
+            if($validate->fails()){
+                return $validate->errors();
+            }
+
+           $validatedData = $validate->validated();
+           $user = User::findOrFail($id);
+
+            if($request->hasFile('thumb')){
+
+                //Verify and delete old image users
+               if(!is_null($user->thumb)){
+                   $old_thumb = $user->thumb;
+                    if(Storage::disk('public')->exists($old_thumb)){
+                       Storage::disk('public')->delete($old_thumb);
+                   }
+               }
+                $thumb = $request->file('thumb');
+               $thumb_name = time().'-mentoria-'.$thumb->getClientOriginalName();
+               $validatedData['thumb'] = $thumb->storeAs('photos', $thumb_name,'public');
+           }
+            $user = $user->update($validatedData);
+
+            return response()->json([
+                'message' => 'Dados do usuario atualizado com sucesso!',
+                'user' => $user,
+            ], 201);
     }
 
 }

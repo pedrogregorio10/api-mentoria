@@ -7,12 +7,12 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="{{route('users')}}" method="post" enctype="multipart/form-data">
+    <form method="post" action="{{route('users',5)}}"  enctype="multipart/form-data">
         @csrf
-
+        @method('patch')
+    
         name<input type="text" name="name" id="">
         email<input type="email" name="email" id="">
-        password<input type="password" name="password" id="">
         bio<input type="text" name="bio" id="">
         photo<input type="file" name="thumb" id="">
         Type<select name="type" id="">

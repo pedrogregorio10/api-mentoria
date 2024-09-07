@@ -6,8 +6,7 @@ use App\Http\Controllers\UserController;
 
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 Route::view('/','create');
 Route::post('/users', [UserController::class, 'store'])->name('users');
+Route::patch('/users/{id}', [UserController::class, 'update'])->name('users');
