@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
-
+use App\Http\Requests\StoreUpdateRequest;
 class UserController extends Controller
 {
     public function index(){
@@ -16,50 +16,27 @@ class UserController extends Controller
         return $user;
     }
 
-    public function store(Request $request){
+    public function store(StoreUpdateRequest $request){
+    
+        $validatedData = $request->validated();
 
-        $validate = Validator::make($request->all(),[
-            'name' => ['required', 'max:255'],
-            'email' =>['required','email','unique:users,email'],
-            'password' => ['required', 'min:8'],
-            'bio' => ['nullable'],
-            'thumb' => ['nullable','max:2048', 'image', 'mimes:png,jpg,jpeg'],
-            'type' => ['required', 'in:mentor,mentee'],
-        ]);
-        if($validate->fails()){
-            return $validate->errors();
-        }
-        $validated = $validate->validated();
         if($request->hasFile('thumb')){
             $thumb = $request->file('thumb');
             $thumb_name = time().'-mentoria-'.$thumb->getClientOriginalName();
-            $validated['thumb'] = $thumb->storeAs('photos',$thumb_name,'public');
+            $validatedData['thumb'] = $thumb->storeAs('photos',$thumb_name,'public');
         }
-        $validated['password'] = Hash::make($validated['password']);
-        $user = User::create($validated);
-
+        $validatedData['password'] = Hash::make($validatedData['password']);
+        $user = User::create($validatedData);
+    
         return response()->json([
-            'massage' => 'Usuario criado com sucesso',
+            'message' => 'Usuario criado com sucesso',
             'user' => $user,
         ],201);
 
     }
+    public function update(StoreUpdateRequest $request, string $id){
 
-    public function update(Request $request, string $id){
-
-            $validate = Validator::make($request->all(), [
-                'name' => ['required', 'max:255'],
-                'email' => ['required','email','unique:users,email,'.$id],
-                'bio' => ['nullable'],
-                'thumb' => ['nullable', 'mimes:jpeg,jpg,png','max:2048'],
-                'type' => ['required', 'in:mentor,mentee'],
-           ]);
-
-            if($validate->fails()){
-                return $validate->errors();
-            }
-
-           $validatedData = $validate->validated();
+           $validatedData = $request->validated();
            $user = User::findOrFail($id);
 
             if($request->hasFile('thumb')){
@@ -71,7 +48,7 @@ class UserController extends Controller
                        Storage::disk('public')->delete($old_thumb);
                    }
                }
-                $thumb = $request->file('thumb');
+               $thumb = $request->file('thumb');
                $thumb_name = time().'-mentoria-'.$thumb->getClientOriginalName();
                $validatedData['thumb'] = $thumb->storeAs('photos', $thumb_name,'public');
            }

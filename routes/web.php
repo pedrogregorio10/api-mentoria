@@ -7,4 +7,4 @@ use App\Http\Controllers\UserController;
 
 
 Route::view('/','create');
-Route::resource('/users', UserController::class);
+Route::patch('/users/{id}', [UserController::class,'update'])->name('users');

@@ -7,19 +7,19 @@
     <title>Document</title>
 </head>
 <body>
-    <form method="post" action="{{route('users',1)}}"  enctype="multipart/form-data">
+    <form method="post" action="{{route('users',22)}}"  enctype="multipart/form-data">
         @csrf
-        @method('delete')
-    <!--
+        @method('patch')
         name<input type="text" name="name" id="">
         email<input type="email" name="email" id="">
         bio<input type="text" name="bio" id="">
         photo<input type="file" name="thumb" id="">
+       
         Type<select name="type" id="">
             <option value="mentor">Mentor</option>
             <option value="mentee">Mentorando</option>
         </select>
-    -->
+    
         <button type="submit">Enviar</button>
     </form>
 </body>

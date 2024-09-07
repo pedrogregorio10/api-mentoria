@@ -11,7 +11,7 @@ class StoreUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,21 @@ class StoreUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+        $rules = [
+            'name' => ['required','max:255'],
+            'email' => ['required','email','unique:users,email','max:255'],
+            'bio' => ['nullable'],
+            'thumb' => ['nullable','max:2048','mimes:jpeg,jpg,png'],
+            'type' => ['required', 'in:mentor,mentee'],
+            'password' => ['required','min:8'],
         ];
+
+        if ($this->isMethod('patch') || $this->isMethod('put')) {
+
+            $rules['email'] = ['required','email', "unique:users,email,{$this->id},id", 'max:255'];
+            $rules['password'] = ['nullable', 'min:8'];
+        }
+    
+        return $rules;
     }
 }
