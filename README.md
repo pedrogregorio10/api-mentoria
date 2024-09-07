@@ -46,6 +46,9 @@ Este projecto foi desenvolvido como tarefa prática da formação de Backend em 
 7. Criar o arquivo de rotas para a API caso não exista
      php artisan install:api
 
+8. Criar as rotas da API
+    Route::apiresource('/users',UserController);
+
 ### Listar Usuarios
 
 - **Método**: GET
