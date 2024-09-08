@@ -41,7 +41,6 @@ class UserController extends Controller
            $user = User::findOrFail($id);
 
             if($request->hasFile('thumb')){
-
                //Envia o a foto, nome da pasta, e a imagem antiga do usuario registrada na BD e remove do armazenamento
                $validatedData['thumb'] = $this->updateUploadThumbTrait($request->file('thumb'),'photos',$user->thumb);
            }
