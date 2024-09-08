@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +19,7 @@ class UserController extends Controller
     }
 
     public function store(StoreUpdateRequest $request){
-    
+
         $validatedData = $request->validated();
 
         if($request->hasFile('thumb')){
@@ -29,7 +28,7 @@ class UserController extends Controller
 
         $validatedData['password'] = Hash::make($validatedData['password']);
         $user = User::create($validatedData);
-    
+
         return response()->json([
             'message' => 'Usuario criado com sucesso',
             'user' => $user,
@@ -43,16 +42,10 @@ class UserController extends Controller
 
             if($request->hasFile('thumb')){
 
-                //Verify and delete old image users
-               if(!is_null($user->thumb)){
-                   $old_thumb = $user->thumb;
-                    if(Storage::disk('public')->exists($old_thumb)){
-                       Storage::disk('public')->delete($old_thumb);
-                   }
-               }
-               //Chama o metodo trait que salva e retorna o path salvo no store, com nome da pasta que se deseja
-               $validatedData['thumb'] = $this->uploadThumbTrait($request->file('thumb'),'photos');
+               //Envia o a foto, nome da pasta, e a imagem antiga do usuario registrada na BD e remove do armazenamento
+               $validatedData['thumb'] = $this->updateUploadThumbTrait($request->file('thumb'),'photos',$user->thumb);
            }
+
             $user = $user->update($validatedData);
 
             return response()->json([
@@ -60,9 +53,10 @@ class UserController extends Controller
                 'user' => $user,
             ], 201);
     }
-    
+
     public function show(string $id){
         $user = User::findOrFail($id);
+
         return response()->json([
             'message' => 'Usuario encontrado!',
             'user' => $user,

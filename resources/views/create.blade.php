@@ -7,18 +7,25 @@
     <title>Document</title>
 </head>
 <body>
-    <form method="post" action="{{route('users',24)}}"  enctype="multipart/form-data">
+    @if ($errors->any()){
+        @foreach ($errors as $error)
+            {{ $erro }}
+        @endforeach
+    }
+
+    @endif
+    <form method="post" action="{{route('users.store')}}"  enctype="multipart/form-data">
         @csrf
-        @method('patch')
-        name<input type="text" name="name" id="">
-        email<input type="email" name="email" id="">
-        bio<input type="text" name="bio" id="">
-        photo<input type="file" name="thumb" id="">
-        Type<select name="type" id="">
+        name<input type="text" name="name" id=""> <br>
+        email<input type="email" name="email" id=""> <br>
+        password <input type="password" name="password" id=""> <br>
+        bio<input type="text" name="bio" id=""> <br> <br>
+        photo<input type="file" name="thumb" id=""> <br>
+        Type<select name="type" id=""> <br>
             <option value="mentor">Mentor</option>
             <option value="mentee">Mentorando</option>
         </select>
-    
+
         <button type="submit">Enviar</button>
     </form>
 </body>
